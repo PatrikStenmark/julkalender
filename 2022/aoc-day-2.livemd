@@ -1,0 +1,142 @@
+# AOC day 2
+
+## Section
+
+```elixir
+defmodule Foo do
+  def parse(line) do
+    line
+    |> String.split(" ")
+    |> then(fn [their, my] ->
+      {
+        parse_their(their),
+        parse_my(my)
+      }
+    end)
+  end
+
+  def parse_their("A"), do: :rock
+  def parse_their("B"), do: :paper
+  def parse_their("C"), do: :scissors
+
+  def parse_my("X"), do: :rock
+  def parse_my("Y"), do: :paper
+  def parse_my("Z"), do: :scissors
+
+  def play(:rock, :rock), do: :draw
+  def play(:rock, :paper), do: :win
+  def play(:rock, :scissors), do: :lose
+  def play(:paper, :rock), do: :lose
+  def play(:paper, :paper), do: :draw
+  def play(:paper, :scissors), do: :win
+  def play(:scissors, :rock), do: :win
+  def play(:scissors, :paper), do: :lose
+  def play(:scissors, :scissors), do: :draw
+
+  def score_play(:rock), do: 1
+  def score_play(:paper), do: 2
+  def score_play(:scissors), do: 3
+
+  def score_result(:win), do: 6
+  def score_result(:draw), do: 3
+  def score_result(:lose), do: 0
+end
+
+input =
+  File.read!("02/input.txt")
+  |> String.trim()
+  |> IO.inspect()
+  |> String.split("\n")
+  # |> Enum.take(10)
+  |> Enum.reduce(0, fn line, score ->
+    {their_play, my_play} = Foo.parse(line)
+
+    result = Foo.play(their_play, my_play)
+
+    play_score = Foo.score_play(my_play)
+    result_score = Foo.score_result(result)
+
+    IO.puts(
+      "#{their_play} <=> #{my_play}: #{result}. Worth: #{play_score} + #{result_score} #Score so far: #{score}"
+    )
+
+    score + play_score + result_score
+  end)
+```
+
+## Version2
+
+```elixir
+defmodule Foo do
+  def parse(line) do
+    line
+    |> String.split(" ")
+    |> then(fn [their, my] ->
+      {
+        parse_their(their),
+        parse_my(my)
+      }
+    end)
+  end
+
+  def parse_their("A"), do: :rock
+  def parse_their("B"), do: :paper
+  def parse_their("C"), do: :scissors
+
+  def parse_my("X"), do: :lose
+  def parse_my("Y"), do: :draw
+  def parse_my("Z"), do: :win
+
+  def play(:rock, :rock), do: :draw
+  def play(:rock, :paper), do: :win
+  def play(:rock, :scissors), do: :lose
+  def play(:paper, :rock), do: :lose
+  def play(:paper, :paper), do: :draw
+  def play(:paper, :scissors), do: :win
+  def play(:scissors, :rock), do: :win
+  def play(:scissors, :paper), do: :lose
+  def play(:scissors, :scissors), do: :draw
+
+  def score_play(:rock), do: 1
+  def score_play(:paper), do: 2
+  def score_play(:scissors), do: 3
+
+  def score_result(:win), do: 6
+  def score_result(:draw), do: 3
+  def score_result(:lose), do: 0
+
+  def play(their_play, wanted_result)
+  def play(:rock, :win), do: :paper
+  def play(:rock, :draw), do: :rock
+  def play(:rock, :lose), do: :scissors
+  def play(:paper, :win), do: :scissors
+  def play(:paper, :draw), do: :paper
+  def play(:paper, :lose), do: :rock
+  def play(:scissors, :win), do: :rock
+  def play(:scissors, :draw), do: :scissors
+  def play(:scissors, :lose), do: :paper
+end
+
+input =
+  File.read!("02/input.txt")
+  |> String.trim()
+  |> IO.inspect()
+  |> String.split("\n")
+  # |> Enum.take(10)
+  |> Enum.reduce(0, fn line, score ->
+    {their_play, wanted_result} = Foo.parse(line)
+
+    my_play = Foo.play(their_play, wanted_result)
+
+    result = Foo.play(their_play, my_play)
+
+    play_score = Foo.score_play(my_play)
+    result_score = Foo.score_result(result)
+
+    IO.puts(
+      "#{their_play} <=> #{my_play}: #{result}. Worth: #{play_score} + #{result_score} #Score so far: #{score}"
+    )
+
+    score + play_score + result_score
+  end)
+```

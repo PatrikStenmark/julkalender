@@ -1,0 +1,41 @@
+# AOC Day 1
+
+## Section
+
+```elixir
+input =
+  File.read!("01/input.txt")
+  |> String.split("\n")
+```
+
+```elixir
+Enum.reduce(input, {0, 0}, fn line, {max, cur} ->
+  if line == "" do
+    if cur > max do
+      {cur, 0}
+    else
+      {max, 0}
+    end
+  else
+    {max, cur + String.to_integer(line)}
+  end
+end)
+```
+
+```elixir
+Enum.reduce(input, {[], 0}, fn line, {top3, cur} ->
+  if line == "" do
+    {
+      [cur | top3]
+      |> Enum.sort()
+      |> Enum.reverse()
+      |> Enum.take(3),
+      0
+    }
+  else
+    {top3, cur + String.to_integer(line)}
+  end
+end)
+|> elem(0)
+|> Enum.sum()
+```
